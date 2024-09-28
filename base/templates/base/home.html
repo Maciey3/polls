@@ -1,0 +1,20 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <h1>Home Template</h1>
+    <div>
+        <a href="{% url 'create-poll' %}">Create Poll</a>
+        <div>
+            {% for poll in polls %}
+                <div>
+                    <a href="{% url 'poll' poll.id %}">
+                        <h4>{{ poll.id }}</h4>
+                    </a>
+                    <p>{{ poll.question }}</p>
+                    <a href="{% url 'update-poll' poll.id %}">Edit</a>
+                    <a href="{% url 'delete-poll' poll.id %}">Delete</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

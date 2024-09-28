@@ -1,0 +1,10 @@
+{%  extends 'main.html' %}
+
+{% block content %}
+    <h1>{{ poll.id }}</h1>
+    <h2>{{ poll.question }}</h2>
+    <h3>{{ poll.description }}</h3>
+    {% for option in options %}
+        <p>Option {{ option.label }}</p>
+    {% endfor %}
+{% endblock %}
