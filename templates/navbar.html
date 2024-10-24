@@ -1,5 +1,23 @@
-<a href="/">
-   <h1>Logo</h1>
-</a>
+<div class="flex justify-between items-center px-8 h-12 shadow-md">
 
-<hr />
+    <a href="/" class="font-bold">
+       Polls
+    </a>
+
+    <div class="flex gap-6">
+        {% if request.user.is_authenticated %}
+            <div class="flex font-bold gap-2">
+                <div class="block rounded-full w-6 h-6 bg-green-400"></div>
+                <span>{{ request.user|capfirst }}</span>
+            </div>
+
+            <a href="{% url 'logout' %}" class="font-bold">
+                Logout
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}" class="font-bold">
+                Login
+            </a>
+        {% endif %}
+    </div>
+</div>

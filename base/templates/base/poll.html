@@ -1,10 +1,42 @@
-{%  extends 'main.html' %}
+{% extends 'main.html' %}
 
 {% block content %}
-    <h1>{{ poll.id }}</h1>
-    <h2>{{ poll.question }}</h2>
-    <h3>{{ poll.description }}</h3>
-    {% for option in options %}
-        <p>Option {{ option.label }}</p>
-    {% endfor %}
+    <div class="mt-12 text-white pb-4 pt-4 px-4 w-1/3 m-auto min-h-24 rounded-xl shadow-xl bg-gradient-to-br from-purple-500 to-pink-500">
+        <div class="mb-2 flex h-8 gap-x-4 place-items-center">
+            <div class="block rounded-full w-6 h-6 bg-green-400"></div>
+            <p class="font-bold">{{ poll.made_by|capfirst }}</p>
+            {% if request.user == poll.made_by %}
+                <div class="text-sm text-black">
+                    <a href="{% url 'edit-poll' poll.id %}" class="underline">Edit</a>
+                    <a href="{% url 'delete-poll' poll.id %}" class="underline">Delete</a>
+                </div>
+            {% endif %}
+        </div>
+        <p class="font-bold text-sm">Question:</p>
+        <p>{{ poll.question }}</p>
+        <p class="mt-6 font-bold text-sm">Description:</p>
+        <p class="">{{ poll.description }}</p>
+
+        {% if already_voted %}
+            <p class="text-center mt-6 font-bold">You have already voted</p>
+            <div class="w-full mt-4 flex items-center justify-center">
+                <form method="POST" action="{% url 'delete-vote' poll.id %}">
+                    {% csrf_token %}
+                    <button class="m-auto text-sm px-2 py-1 border-[3px] border-blue-500 hover:bg-white hover:text-blue-500 text-white bg-blue-500 rounded-xl ease-in duration-100 font-bold">
+                        Delete my vote
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <p class="mt-6 font-bold text-sm">Answers:</p>
+            <form method="POST" action="{% url 'vote' poll.id %}">
+                {% csrf_token %}
+                {% for option in options %}
+                    <input id="{{ forloop.counter }}" value="{{ option.id }}" class="" type="radio" name="vote" />
+                    <label for="{{ forloop.counter }}">{{ option.label }}</label> <br/>
+                {% endfor %}
+                <button type="submit" class="text-sm mt-2 bg-white text-black px-2 rounded-xl">Vote</button>
+            </form>
+        {% endif %}
+    </div>
 {% endblock %}

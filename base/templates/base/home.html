@@ -1,18 +1,37 @@
 {% extends 'main.html' %}
 
 {% block content %}
-    <h1>Home Template</h1>
-    <div>
-        <a href="{% url 'create-poll' %}">Create Poll</a>
-        <div>
+    <div class="m-auto px-8">
+        <div class="mt-12 m-auto w-1/3">
+            <form action="{% url 'home' %}">
+                <input class="resize-y w-full py-2 px-6 border-2 border-gray-300 shadow-xl rounded-2xl ease-in-out duration-300 placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0" id="search" type="text" name="q" value='{{ search }}' placeholder="Search..."/>
+            </form>
+        </div>
+        <br/>
+        <div class="w-full flex items-center">
+            <a class="m-auto px-2 py-1 border-[3px] border-blue-500 hover:bg-white hover:text-blue-500 text-white bg-blue-500 rounded-xl ease-in duration-100 font-bold" href="{% url 'create-poll' %}">Create Poll</a>
+        </div>
+        <div class="inline-grid grid-cols-3 items-baseline w-full justify-items-center mt-6 gap-y-24">
             {% for poll in polls %}
-                <div>
-                    <a href="{% url 'poll' poll.id %}">
-                        <h4>{{ poll.id }}</h4>
-                    </a>
+                <div class="text-white pb-4 pt-4 px-4 w-2/3 min-h-36 rounded-xl shadow-xl bg-gradient-to-br from-purple-500 to-pink-500">
+                    <div class="mb-2 flex h-8 gap-x-4 place-items-center">
+                        <div class="block rounded-full w-6 h-6 bg-green-400"></div>
+                        <p class="font-bold">{{ poll.made_by|capfirst }}</p>
+                        {% if request.user == poll.made_by %}
+                            <div class="text-sm text-black">
+                                <a href="{% url 'edit-poll' poll.id %}" class="underline">Edit</a>
+                                <a href="{% url 'delete-poll' poll.id %}" class="underline">Delete</a>
+                            </div>
+                        {% endif %}
+                    </div>
                     <p>{{ poll.question }}</p>
-                    <a href="{% url 'update-poll' poll.id %}">Edit</a>
-                    <a href="{% url 'delete-poll' poll.id %}">Delete</a>
+                    <a href="{% url 'poll' poll.id %}" class="mt-2 text-black !block m-auto justify-center content-center text-center bg-white w-8 h-8 rounded-full ">
+                        <i class="fa-solid fa-arrow-down "></i>
+                    </a>
+                    {#                    <a href="{% url 'poll' poll.id %}">#}
+{#                        <h3>{{ poll.id }}</h3>#}
+{#                    </a>#}
+{#                    <p>{{ poll.question }}</p>#}
                 </div>
             {% endfor %}
         </div>

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'compressor',
 
     'base.apps.BaseConfig',
 ]
@@ -72,6 +73,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'djangoPolls.wsgi.application'
+
+# Compressor
+COMPRESS_ROOT = BASE_DIR / 'static'
+
+COMPRESS_ENABLED = True
+
+STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
 
 
 # Database
