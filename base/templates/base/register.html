@@ -1,0 +1,17 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <form method="POST" action="{% url 'register' %}">
+        <div class="m-auto w-1/3 mt-24 grid grid-cols-1 border-2 border-gray-300 shadow-xl p-6 pt-16 gap-y-6 rounded-xl justify-items-center">
+            {% csrf_token %}
+            <input id="username" type="text" name="username" placeholder="Username" required class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
+            <input id="password" type="password" name="password" placeholder="Password" required class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
+            <input id="re-password" type="password" name="re-password" placeholder="Confirm password" required class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
+            <button type="submit" class="mt-4 w-32 m-auto px-2 py-1 border-[3px] border-blue-500 hover:bg-white hover:text-blue-500 text-white bg-blue-500 rounded-xl ease-in duration-100 font-bold">Register</button>
+            <div class="text-center">
+                <p>Already signed up?</p>
+                <a class="text-blue-500 hover:text-blue-700" href="{% url 'login' %}">Log in</a>
+            </div>
+        </div>
+    </form>
+{% endblock %}

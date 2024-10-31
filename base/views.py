@@ -10,6 +10,7 @@ from django.views.decorators.http import require_http_methods, require_POST
 from .models import Poll, Option, Vote
 from .forms import PollForm
 
+
 def login_page(request):
     page = 'login'
     if request.user.is_authenticated:
@@ -33,28 +34,35 @@ def login_page(request):
             messages.error(request, "Username or password doesnt exist")
 
     context = {'page': page}
-    return render(request, 'base/login_register.html', context)
+    return render(request, 'base/login.html', context)
+
 
 def logout_user(request):
     logout(request)
     return redirect('home')
 
-def register_page(request):
-    page = 'register'
-    form = UserCreationForm()
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.username = user.username.lower()
-            user.save()
-            login(request, user)
-            return redirect('home')
-        else:
-            messages.error(request, 'An error occurred during registration')
 
-    context = {'page': page, 'form': form}
-    return render(request, 'base/login_register.html', context)
+def register_page(request):
+    context = {}
+    return render(request, 'base/register.html', context)
+
+@require_POST
+def register(request):
+    username = request.POST.get('username').lower()
+    password = request.POST.get('password')
+    repassword = request.POST.get('re-password')
+    if password != repassword:
+        messages.error(request, 'Passwords dont match.')
+        return redirect('register-page')
+
+    user = User.objects.create(
+        username=username,
+        password=password
+    )
+
+    login(request, user)
+    messages.success(request, 'Successfully registered!')
+    return redirect('home')
 
 def home(request):
     def cut_poll_description(poll):
@@ -97,6 +105,7 @@ def store_poll(request):
     description = request.POST.get('description')
     options = request.POST.getlist('options[]')
 
+
     poll = Poll.objects.create(
         question=question,
         description=description,
@@ -133,11 +142,23 @@ def edit_poll(request, pk):
 def update_poll(request, pk):
     question = request.POST.get('question')
     description = request.POST.get('description')
+    options = request.POST.getlist('options[]')
 
-    poll = Poll.objects.filter(id=pk).update(
+    Poll.objects.filter(id=pk).update(
         question=question,
         description=description
     )
+
+    poll = Poll.objects.get(id=pk)
+    previous_options = poll.options
+    [option.delete() for option in previous_options]
+
+    for option in options:
+        Option.objects.create(
+            label=option.strip(),
+            poll=poll
+        )
+
     messages.success(request, "Poll edited successfully!")
     return redirect('home')
 
@@ -156,6 +177,7 @@ def delete_poll(request, pk):
     context = {'obj': poll}
     return render(request, 'base/delete.html', context)
 
+@login_required(login_url='login')
 def vote(request, pk):
     option_id = request.POST.get('vote')
     user_id = request.user.id

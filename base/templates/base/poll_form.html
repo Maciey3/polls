@@ -11,17 +11,23 @@
             <textarea id="question" name="question" class="py-2 min-h-24 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0" onload="alert(1)" oninput="this.style.height = ''; this.style.height = this.scrollHeight +'px'">{% if poll %}{{ poll.question.lstrip }}{% endif %}</textarea>
             <label for="description" class="font-bold text-xl">Description</label>
             <textarea id="description" name="description" class="py-2 min-h-24 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0" onload="this.style.height = ''; this.style.height = this.scrollHeight +'px'" oninput="this.style.height = ''; this.style.height = this.scrollHeight +'px'">{% if poll %}{{ poll.description }}{% endif %}</textarea>
-            {% if poll %}
-                {% for option in options %}
-            	    <label for="vote{{ forloop.counter0|add:"1" }}" class="font-bold text-xl">Option No.{{ forloop.counter0|add:"1" }}</label>
-                    <input value="{% if poll %} {{ option.label }} {% endif %}" id="vote{{ forloop.counter0|add:"1" }}" name="options[]" type="text" class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
-                {% endfor %}
-            {% else %}
-                <label for="vote1" class="font-bold text-xl">Option No.1</label>
-                <input id="vote1" name="options[]" type="text" class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
-                <label for="vote2" class="font-bold text-xl">Option No.2</label>
-                <input id="vote2" name="options[]" type="text" class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
-            {% endif %}
+            <div id="options" class="grid grid-cols-1 w-full m-auto justify-items-center gap-2">
+                {% if poll %}
+                    {% for option in options %}
+                        <label for="vote{{ forloop.counter0|add:"1" }}" class="font-bold text-xl">Option No.{{ forloop.counter0|add:"1" }}</label>
+                        <input value="{% if poll %}{{ option.label }}{% endif %}" id="vote{{ forloop.counter0|add:"1" }}" name="options[]" type="text" class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
+                    {% endfor %}
+                {% else %}
+                    <label for="vote1" class="font-bold text-xl">Option No.1</label>
+                    <input id="vote1" name="options[]" type="text" class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
+                    <label for="vote2" class="font-bold text-xl">Option No.2</label>
+                    <input id="vote2" name="options[]" type="text" class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
+                {% endif %}
+            </div>
+            <div class="flex gap-2">
+                <button id="addOption" type="button" class="mt-4 m-auto px-3 py-1 border-[3px] border-green-500 hover:bg-white hover:text-green-500 text-white bg-green-500 rounded-xl ease-in duration-100 font-bold"><i class="fa-solid fa-plus"></i></button>
+                <button id="removeOption" type="button" class="mt-4 m-auto px-3 py-1 border-[3px] border-red-500 hover:bg-white hover:text-red-500 text-white bg-red-500 rounded-xl ease-in duration-100 font-bold"><i class="fa-solid fa-minus"></i></button>
+            </div>
             <button type="submit" class="mt-4 w-32 m-auto px-2 py-1 border-[3px] border-blue-500 hover:bg-white hover:text-blue-500 text-white bg-blue-500 rounded-xl ease-in duration-100 font-bold">Create</button>
         </div>
     </form>
@@ -32,6 +38,34 @@
             textarea.style.height = '';
             textarea.style.height = textarea.scrollHeight +'px'
         })
-        console.log(textareas);
+        {#console.log(textareas);#}
+
+        document.getElementById("addOption").addEventListener("click", function(){
+            let query = document.querySelectorAll('[name="options[]"]');
+            {#let vote = query[0];#}
+            let label = document.createElement("label");
+            label.classList.add("font-bold", "text-xl");
+            label.htmlFor = `vote${query.length+1}`;
+            label.innerHTML = `Option No. ${query.length+1}`;
+            let element = document.createElement("input");
+            element.name = "options[]";
+            element.id = `vote${query.length+1}`;
+            element.classList.add("py-2", "h-12", "w-2/3", "px-6", "border-2", "border-gray-300", "rounded-xl", "shadow-xl", "placeholder:font-bold", "focus:ring-blue-500", "focus:border-blue-400", "focus:shadow-blue-100", "focus-visible:ring-0", "focus-visible:outline-0");
+            let optionDiv = document.getElementById("options");
+            optionDiv.appendChild(label);
+            optionDiv.appendChild(element);
+        });
+
+        document.getElementById("removeOption").addEventListener("click", function(){
+            let query = document.querySelectorAll('[name="options[]"]');
+            {#let element = query[query.length-1];#}
+            let optionDiv = document.getElementById("options");
+            let label = optionDiv.querySelectorAll('label')[query.length-1];
+            let vote = optionDiv.querySelectorAll('input')[query.length-1];
+            console.log();
+            optionDiv.removeChild(label);
+            optionDiv.removeChild(vote);
+        });
+
     </script>
 {% endblock %}

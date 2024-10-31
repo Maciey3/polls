@@ -12,9 +12,9 @@
                 </div>
             {% endif %}
         </div>
-        <p class="font-bold text-sm">Question:</p>
+        <p class="font-bold">Question:</p>
         <p>{{ poll.question }}</p>
-        <p class="mt-6 font-bold text-sm">Description:</p>
+        <p class="mt-6 font-bold">Description:</p>
         <p class="">{{ poll.description }}</p>
 
         {% if already_voted %}
@@ -28,14 +28,25 @@
                 </form>
             </div>
         {% else %}
-            <p class="mt-6 font-bold text-sm">Answers:</p>
+            <p class="mt-6 font-bold">Answers:</p>
             <form method="POST" action="{% url 'vote' poll.id %}">
                 {% csrf_token %}
                 {% for option in options %}
-                    <input id="{{ forloop.counter }}" value="{{ option.id }}" class="" type="radio" name="vote" />
-                    <label for="{{ forloop.counter }}">{{ option.label }}</label> <br/>
+                    <div role="button" class="flex items-center rounded-lg p-0 transition-all bg-blue-100 bg-opacity-0 hover:bg-opacity-40 focus:bg-slate-100 active:bg-slate-100">
+                        <label for="{{ forloop.counter }}" class="w-full flex cursor-pointer items-center px-3 py-2">
+                            <div class="inline-flex items-center">
+                                <label class="relative flex items-center cursor-pointer" for="{{ forloop.counter }}">
+                                    <input name="vote" type="radio" value="{{ option.id }}" id="{{ forloop.counter }}" class="peer h-4 w-4 cursor-pointer appearance-none rounded-sm bg-white shadow-xl checked:border-slate-400 transition-all"/>
+                                    <span class="absolute bg-black/50 w-2 h-2 rounded-sm opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                                </label>
+                                <label class="w-full ml-2 cursor-pointer" for="{{ forloop.counter }}">
+                                    {{ option.label }}
+                                </label>
+                            </div>
+                        </label>
+                    </div>
                 {% endfor %}
-                <button type="submit" class="text-sm mt-2 bg-white text-black px-2 rounded-xl">Vote</button>
+                <button type="submit" class="mt-4 m-auto px-2 py-1 border-[3px] border-blue-500 hover:bg-white hover:text-blue-500 text-white bg-blue-500 rounded-xl ease-in duration-100 font-bold">Vote</button>
             </form>
         {% endif %}
     </div>

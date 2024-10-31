@@ -15,6 +15,10 @@ class Poll(models.Model):
     def __str__(self):
         return self.question
 
+    @property
+    def options(self):
+        return self.option_set.all()
+
 class Option(models.Model):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     label = models.TextField()
