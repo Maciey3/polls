@@ -2,67 +2,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserCreationForm
 from django.views.decorators.http import require_http_methods, require_POST
 from .models import Poll, Option, Vote
-from .forms import PollForm
 
-
-def login_page(request):
-    page = 'login'
-    if request.user.is_authenticated:
-        return redirect('home')
-
-    if request.method == 'POST':
-        username = request.POST.get('username').lower()
-        password = request.POST.get('password')
-
-        try:
-            user = User.objects.get(username=username)
-        except:
-            messages.error(request, "User doesnt exist")
-
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            login(request, user)
-            return redirect('home')
-        else:
-            messages.error(request, "Username or password doesnt exist")
-
-    context = {'page': page}
-    return render(request, 'base/login.html', context)
-
-
-def logout_user(request):
-    logout(request)
-    return redirect('home')
-
-
-def register_page(request):
-    context = {}
-    return render(request, 'base/register.html', context)
-
-@require_POST
-def register(request):
-    username = request.POST.get('username').lower()
-    password = request.POST.get('password')
-    repassword = request.POST.get('re-password')
-    if password != repassword:
-        messages.error(request, 'Passwords dont match.')
-        return redirect('register-page')
-
-    user = User.objects.create(
-        username=username,
-        password=password
-    )
-
-    login(request, user)
-    messages.success(request, 'Successfully registered!')
-    return redirect('home')
 
 def home(request):
     def cut_poll_description(poll):
@@ -74,6 +17,7 @@ def home(request):
     polls = Poll.objects.filter(
         Q(question__icontains=q) | Q(description__icontains=q)
     )
+
     polls_shortened = [poll if len(poll.question) < question_len else cut_poll_description(poll) for poll in polls]
     context = {'polls': polls_shortened, 'search': q}
     return render(request, 'base/home.html', context)
@@ -81,18 +25,21 @@ def home(request):
 def poll(request, pk):
     poll = Poll.objects.get(id=pk)
     options = poll.option_set.all()
-    already_voted = Vote.objects.filter(
+    votes = Vote.objects.filter(
         Q(poll_id=pk) & Q(user_id=request.user.id)
-    ).exists()
+    )
+
+    vote_id = votes.get().option_id if votes else None
+
     context = {
         'poll': poll,
         'options': options,
-        'already_voted': already_voted
+        'already_voted': votes.exists(),
+        'vote_id': vote_id
     }
     return render(request, 'base/poll.html', context)
 
 @login_required(login_url='login')
-
 def create_poll(request):
     context = {'action': 'store-poll'}
     return render(request, 'base/poll_form.html', context)

@@ -17,7 +17,11 @@ class Poll(models.Model):
 
     @property
     def options(self):
-        return self.option_set.all()
+        return (self.option_set.all())
+
+    @property
+    def user(self):
+        return self.made_by
 
 class Option(models.Model):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)

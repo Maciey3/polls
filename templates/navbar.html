@@ -1,14 +1,18 @@
 <div class="flex justify-between items-center px-8 h-12 shadow-md">
 
     <a href="/" class="font-bold">
-       Polls
+       <img class="h-10" src="/media/logo-name.png">
     </a>
 
     <div class="flex gap-6">
         {% if request.user.is_authenticated %}
             <div class="flex font-bold gap-2">
-                <div class="block rounded-full w-6 h-6 bg-green-400"></div>
-                <span>{{ request.user|capfirst }}</span>
+                {% if user.profile.image %}
+                    <img class="rounded-full w-6 h-6" src="{{ user.profile.image.url }}" />
+                {% else %}
+                    <i class="text-2xl self-center fa-regular fa-circle-user"></i>
+                {% endif %}
+                <a href="{% url 'members.profile' %}">{{ request.user|capfirst }}</a>
             </div>
 
             <a href="{% url 'logout' %}" class="font-bold">
