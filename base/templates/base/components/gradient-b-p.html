@@ -1,0 +1,20 @@
+<div class="text-white pb-4 pt-4 px-4 w-2/3 min-h-40 rounded-xl shadow-xl bg-gradient-to-br from-purple-500 to-pink-500">
+    <div class="mb-4 flex h-8 gap-x-2 place-items-center">
+        {% if poll.user.profile.image %}
+            <img class="rounded-full w-8 h-8" src="{{ poll.user.profile.image.url }}" />
+        {% else %}
+            <i class="text-2xl self-center fa-regular fa-circle-user"></i>
+        {% endif %}
+        <p class="font-bold text-xl">{{ poll.made_by|capfirst }}</p>
+        {% if request.user == poll.made_by %}
+            <div class="text-sm text-black">
+                <a href="{% url 'edit-poll' poll.id %}" class="underline">Edit</a>
+                <a href="{% url 'delete-poll' poll.id %}" class="underline">Delete</a>
+            </div>
+        {% endif %}
+    </div>
+    <p>{{ poll.question }}</p>
+    <a href="{% url 'poll' poll.id %}" class="mt-4 text-black !block m-auto justify-center content-center text-center bg-white w-8 h-8 rounded-full ">
+        <i class="fa-solid fa-arrow-down "></i>
+    </a>
+</div>

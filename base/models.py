@@ -2,12 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Style(models.Model):
+    name = models.TextField()
+
 class Poll(models.Model):
     question = models.TextField()
     description = models.TextField(null=True, blank=True)
     made_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    styles = models.ManyToManyField(Style)
 
     class Meta:
         ordering = ['-updated', '-created']
@@ -42,4 +46,7 @@ class Vote(models.Model):
 
     def __str__(self):
         return self.option.label
+
+
+
 

@@ -4,7 +4,8 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods, require_POST
-from .models import Poll, Option, Vote
+from .models import Poll, Option, Vote, Style
+import json
 
 
 def home(request):
@@ -17,31 +18,53 @@ def home(request):
     polls = Poll.objects.filter(
         Q(question__icontains=q) | Q(description__icontains=q)
     )
-
+    print(polls.first().styles.get().id)
     polls_shortened = [poll if len(poll.question) < question_len else cut_poll_description(poll) for poll in polls]
     context = {'polls': polls_shortened, 'search': q}
     return render(request, 'base/home.html', context)
 
 def poll(request, pk):
+    def compute_percent(votes, options):
+        tmp = {}
+
+        for vote in votes:
+            option = vote.option
+            if option.label not in tmp:
+                tmp[option.label] = 1
+            else:
+                tmp[option.label] += 1
+
+        for option in options:
+            if option.label in tmp:
+                option.percent = tmp[option.label] / len(votes) * 100
+            else:
+                option.percent = 0
+        # print(tmp.keys(), tmp.values())
+        return options, tmp
+
     poll = Poll.objects.get(id=pk)
     options = poll.option_set.all()
-    votes = Vote.objects.filter(
-        Q(poll_id=pk) & Q(user_id=request.user.id)
-    )
+    votes = Vote.objects.filter(poll_id=pk)
+    options, js_dict = compute_percent(votes, options)
 
-    vote_id = votes.get().option_id if votes else None
+    user_vote = votes.filter(user_id=request.user.id)
+
+    print(list(js_dict.keys()))
 
     context = {
         'poll': poll,
         'options': options,
-        'already_voted': votes.exists(),
-        'vote_id': vote_id
+        'already_voted': user_vote.exists(),
+        'vote_id': user_vote.get().option_id if user_vote else None,
+        'js_keys': json.dumps(list(js_dict.keys())),
+        'js_values': json.dumps(list(js_dict.values())),
     }
     return render(request, 'base/poll.html', context)
 
 @login_required(login_url='login')
 def create_poll(request):
-    context = {'action': 'store-poll'}
+    styles = Style.objects.all()
+    context = {'action': 'store-poll', 'styles': styles}
     return render(request, 'base/poll_form.html', context)
 
 @login_required(login_url='login')
@@ -51,13 +74,16 @@ def store_poll(request):
     question = request.POST.get('question')
     description = request.POST.get('description')
     options = request.POST.getlist('options[]')
+    style = request.POST.get('style')
 
 
     poll = Poll.objects.create(
         question=question,
         description=description,
-        made_by=request.user
+        made_by=request.user,
     )
+
+    poll.styles.add(Style.objects.get(id=style))
 
     for option in options:
         Option.objects.create(

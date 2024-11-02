@@ -12,6 +12,14 @@
                 <textarea id="question" name="question" class="py-2 min-h-24 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0" onload="alert(1)" oninput="this.style.height = ''; this.style.height = this.scrollHeight +'px'">{% if poll %}{{ poll.question.lstrip }}{% endif %}</textarea>
                 <label for="description" class="font-bold text-xl">Description</label>
                 <textarea id="description" name="description" class="py-2 min-h-24 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0" onload="this.style.height = ''; this.style.height = this.scrollHeight +'px'" oninput="this.style.height = ''; this.style.height = this.scrollHeight +'px'">{% if poll %}{{ poll.description }}{% endif %}</textarea>
+
+                <label for="underline_select" class="font-bold text-xl">Style</label>
+                <select name="style" id="underline_select" class="font-bold block py-2.5 px-0 w-2/3 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                    <option selected>Choose style</option>
+                    {% for style in styles %}
+                        <option value="{{ style.id }}">{{ style.name }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div id="options" class="grid grid-cols-1 justify-items-center gap-6">
                 {% if poll %}
