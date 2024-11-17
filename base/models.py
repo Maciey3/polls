@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 class Style(models.Model):
     name = models.TextField()
+    tailwind_classes = models.TextField(null=True)
 
 class Poll(models.Model):
     question = models.TextField()

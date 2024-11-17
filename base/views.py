@@ -18,7 +18,7 @@ def home(request):
     polls = Poll.objects.filter(
         Q(question__icontains=q) | Q(description__icontains=q)
     )
-    print(polls.first().styles.get().id)
+    # print(polls.first().styles.get().id)
     polls_shortened = [poll if len(poll.question) < question_len else cut_poll_description(poll) for poll in polls]
     context = {'polls': polls_shortened, 'search': q}
     return render(request, 'base/home.html', context)
@@ -74,8 +74,7 @@ def store_poll(request):
     question = request.POST.get('question')
     description = request.POST.get('description')
     options = request.POST.getlist('options[]')
-    style = request.POST.get('style')
-
+    style = request.POST.getlist('styles[]')[0]
 
     poll = Poll.objects.create(
         question=question,
@@ -98,14 +97,15 @@ def store_poll(request):
 def edit_poll(request, pk):
     poll = Poll.objects.get(id=pk)
     options = Option.objects.filter(poll=poll)
+    styles = Style.objects.all()
 
     if request.user != poll.made_by:
         messages.error(request, "You are not allowed to edit this poll.")
         return redirect('home')
 
-
     context = {
         'action': "update-poll",
+        'styles': styles,
         'action_id': pk,
         'poll' : poll,
         'options': options
@@ -116,6 +116,12 @@ def update_poll(request, pk):
     question = request.POST.get('question')
     description = request.POST.get('description')
     options = request.POST.getlist('options[]')
+    styles = request.POST.getlist('styles[]')
+
+    if not styles:
+        messages.error(request, "Style is required")
+        return redirect('edit-poll', pk)
+
 
     Poll.objects.filter(id=pk).update(
         question=question,
@@ -131,6 +137,9 @@ def update_poll(request, pk):
             label=option.strip(),
             poll=poll
         )
+
+    poll.styles.clear()
+    poll.styles.add(styles[0])
 
     messages.success(request, "Poll edited successfully!")
     return redirect('home')
@@ -171,3 +180,27 @@ def delete_vote(request, pk):
 
     messages.success(request, "Vote deleted successfully!")
     return redirect('poll', pk)
+
+def seed(request):
+    Style.objects.create(
+        name='Purple to pink gradient',
+        tailwind_classes='bg-gradient-to-br from-purple-500 to-pink-500'
+    )
+    Style.objects.create(
+        name='Green to blue gradient',
+        tailwind_classes='bg-gradient-to-br from-green-500 to-blue-500'
+    )
+    Style.objects.create(
+        name='Red to pink gradient',
+        tailwind_classes='bg-gradient-to-br from-red-300 to-pink-500'
+    )
+    Style.objects.create(
+        name='Orange border',
+        tailwind_classes='bg-orange-300 border-4 border-orange-500'
+    )
+    Style.objects.create(
+        name='White dashed border with dark blue background',
+        tailwind_classes='border-4 bg-indigo-800 border-white border-dashed'
+    )
+
+    return redirect('home')

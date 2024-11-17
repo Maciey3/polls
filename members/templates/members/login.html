@@ -2,7 +2,7 @@
 
 {% block content %}
     <form method="POST" action="">
-        <div class="m-auto w-1/3 mt-24 grid grid-cols-1 border-2 border-gray-300 shadow-xl p-6 pt-8 gap-y-6 rounded-xl justify-items-center">
+        <div class="m-auto w-1/3 mt-24 grid grid-cols-1 border-2 border-gray-300 bg-white shadow-xl p-6 pt-8 gap-y-6 rounded-xl justify-items-center">
             {% csrf_token %}
             <img class="h-40" src="../media/logo-full.png"/>
             <input id="username" type="text" name="username" placeholder="Username" class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>

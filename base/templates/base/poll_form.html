@@ -1,47 +1,268 @@
 {% extends 'main.html' %}
 
 {% block content %}
-    <div class="text-center w-full mt-10">
-        <p class="text-5xl font-bold italic">Create Poll</p>
-    </div>
-    <form method="POST" action="{% if action_id %}{% url action action_id %}{% else %}{% url action %}{% endif %}">
+    <form action="{% if action_id %}{% url action action_id %}{% else %}{% url action %}{% endif %}" method="POST">
         {% csrf_token %}
-        <div class="grid grid-cols-2 m-auto mt-8 px-8 w-3/4 gap-6 border-2 border-gray-300 shadow-xl py-16 rounded-xl">
-            <div class="grid grid-cols-1 gap-6 auto-rows-max justify-items-center">
-                <label for="question" class="font-bold text-xl">Question</label>
-                <textarea id="question" name="question" class="py-2 min-h-24 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0" onload="alert(1)" oninput="this.style.height = ''; this.style.height = this.scrollHeight +'px'">{% if poll %}{{ poll.question.lstrip }}{% endif %}</textarea>
-                <label for="description" class="font-bold text-xl">Description</label>
-                <textarea id="description" name="description" class="py-2 min-h-24 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0" onload="this.style.height = ''; this.style.height = this.scrollHeight +'px'" oninput="this.style.height = ''; this.style.height = this.scrollHeight +'px'">{% if poll %}{{ poll.description }}{% endif %}</textarea>
+        <div class="mt-8 grid grid-cols-[12fr_1fr_20fr]">
+            <div class="p-8 bg-white">
+                <p class="text-xl font-bold">Create Poll</p>
+                <button type="submit" class="block mt-8 mb-12 w-full m-auto px-2 py-1 border-[3px] border-blue-500 hover:bg-white hover:text-blue-500 text-white bg-blue-500 rounded-md ease-in duration-100 font-bold">
+                    <i class="fa-solid fa-check"></i> Create
+                </button>
+                <div class="mt-4 flex gap-x-4 justify-items-center items-center">
+                    <i class="text-blue-500 text-xl fa-solid fa-circle-info"></i>
+                    <p class="text-xl font-bold">Information</p>
+                </div>
+                <div class="mt-4 grid grid-cols-1">
+                    <label for="question" class="font-semibold text-sm mb-1">
+                        Question <span class="text-red-500 font-bold">*</span>
+                    </label>
+                    <textarea required id="question" name="question" class="py-2 min-h-24 w-full px-6 border-2 border-gray-300 rounded-md shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0">{% if poll %}{{ poll.question.lstrip }}{% endif %}</textarea>
+                </div>
+                <div class="mt-4 grid grid-cols-1">
+                    <label for="description" class="font-semibold text-sm mb-1">
+                        Description
+                    </label>
+                    <textarea id="description" name="description" class="py-2 min-h-24 w-full px-6 border-2 border-gray-300 rounded-md shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0">{% if poll %}{{ poll.description.lstrip }}{% endif %}</textarea>
+                </div>
+{#                <div class="mt-4 grid grid-cols-1">#}
+{#                    <label for="tags" class="font-semibold text-sm mb-1">#}
+{#                        Tags <span class="text-red-500 font-bold">*</span>#}
+{#                    </label>#}
+{#                    <select multiple name="tags" id="countries_multiple" class="py-2 h-20 w-full px-6 border-2 border-gray-300 rounded-md shadow-xl">#}
+{#                        <option value="US">United States</option>#}
+{#                        <option value="CA">Canada</option>#}
+{#                        <option value="FR">France</option>#}
+{#                        <option value="DE">Germany</option>#}
+{#                    </select>#}
+{#                </div>#}
+            </div>
 
-                <label for="underline_select" class="font-bold text-xl">Style</label>
-                <select name="style" id="underline_select" class="font-bold block py-2.5 px-0 w-2/3 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-                    <option selected>Choose style</option>
-                    {% for style in styles %}
-                        <option value="{{ style.id }}">{{ style.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div id="options" class="grid grid-cols-1 justify-items-center gap-6">
-                {% if poll %}
-                    {% for option in options %}
-                        <label for="vote{{ forloop.counter0|add:"1" }}" class="font-bold text-xl">Option No.{{ forloop.counter0|add:"1" }}</label>
-                        <input value="{% if poll %}{{ option.label }}{% endif %}" id="vote{{ forloop.counter0|add:"1" }}" name="options[]" type="text" class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
-                    {% endfor %}
-                {% else %}
-                    <label for="vote1" class="font-bold text-xl">Option No.1</label>
-                    <input id="vote1" name="options[]" type="text" class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
-                    <label for="vote2" class="font-bold text-xl">Option No.2</label>
-                    <input id="vote2" name="options[]" type="text" class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
-                {% endif %}
-            </div>
             <div></div>
-            <div class="flex justify-self-center gap-2">
-                <button id="addOption" type="button" class="mt-4 m-auto px-3 py-1 border-[3px] border-green-500 hover:bg-white hover:text-green-500 text-white bg-green-500 rounded-xl ease-in duration-100 font-bold"><i class="fa-solid fa-plus"></i></button>
-                <button id="removeOption" type="button" class="mt-4 m-auto px-3 py-1 border-[3px] border-red-500 hover:bg-white hover:text-red-500 text-white bg-red-500 rounded-xl ease-in duration-100 font-bold"><i class="fa-solid fa-minus"></i></button>
+
+            <div>
+                <div class="flex justify-center">
+                    <label class="inline-flex justify-center items-center cursor-pointer">
+                        <span class="me-3 text-sm font-medium text-gray-900 dark:text-gray-300">Edit options</span>
+                        <input id="switchContent" type="checkbox" value="" class="sr-only peer">
+                        <div class="relative w-11 h-6 bg-blue-500 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-500"></div>
+                        <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Edit style</span>
+                    </label>
+                </div>
+
+                <div id="optionsContent" class="p-8 mt-8 h-[576px] bg-white rounded-md">
+                    <div class="mt-4 flex gap-x-4 justify-items-center items-center">
+                        <i class="text-blue-500 text-xl fa-solid fa-comment"></i>
+                        <p class="text-xl font-bold">Options</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="addOption" type="button" class="mt-4 px-2 border-[3px] border-green-500 hover:bg-white hover:text-green-500 text-white bg-green-500 rounded-md ease-in duration-100 font-bold"><i class="fa-solid fa-plus"></i></button>
+                        <button id="removeOption" type="button" class="mt-4 px-2 border-[3px] border-red-500 hover:bg-white hover:text-red-500 text-white bg-red-500 rounded-md ease-in duration-100 font-bold"><i class="fa-solid fa-minus"></i></button>
+                    </div>
+                    <div id="optionsContainer" class="h-[27rem] overflow-auto">
+                        {% if poll %}
+                            {% for option in options %}
+                                <div class="mt-4 grid grid-cols-1">
+                                    <label for="option{{ forloop.counter0|add:"1" }}" class="font-semibold text-sm mb-1">
+                                        Option No.{{ forloop.counter0|add:"1" }}
+                                    </label>
+                                    <input id="option{{ forloop.counter0|add:"1" }}" name="options[]" value="{{ option.label }}" class="py-2 w-3/4 px-6 border-2 border-gray-300 rounded-md shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="mt-4 grid grid-cols-1">
+                                <label for="option1" class="font-semibold text-sm mb-1">
+                                    Option No.1 <span class="text-red-500 font-bold">*</span>
+                                </label>
+                                <input required id="option1" name="options[]" class="py-2 w-3/4 px-6 border-2 border-gray-300 rounded-md shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
+                            </div>
+                            <div class="mt-4 grid grid-cols-1">
+                                <label for="option2" class="font-semibold text-sm mb-1">
+                                    Option No.2 <span class="text-red-500 font-bold">*</span>
+                                </label>
+                                <input required id="option2" name="options[]" class="py-2 w-3/4 px-6 border-2 border-gray-300 rounded-md shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div id="styleContent" class="hidden p-8 mt-8 h-[576px] bg-white rounded-md">
+                    <div class="mt-4 flex gap-x-4 justify-items-center items-center">
+                        <i class="text-blue-500 text-xl fa-solid fa-brush"></i>
+                        <p class="text-xl font-bold">Styling</p>
+                    </div>
+                    <div class="mt-8 grid grid-cols-3 justify-items-center gap-y-8">
+                        {% for style in styles %}
+                        	<input id="scheme-{{ forloop.counter0|add:"1" }}" class="peer/{{ forloop.counter0|add:"1" }} hidden" type="checkbox" name="styles[]" value="{{ style.id }}" {% if poll and poll.styles.first == style %} checked {% endif %}/>
+                            <label for="scheme-{{ forloop.counter0|add:"1" }}" class="
+                            relative peer-checked/{{ forloop.counter0|add:"1" }}:scale-110 ease-in-out duration-300
+                            text-white pb-4 pt-4 px-4 w-2/3 min-h-40
+                            rounded-xl shadow-xl
+                            {{ style.tailwind_classes }}
+                            " onclick="this.querySelector('div[id=check]').classList.toggle('opacity-0');">
+                                <div class="mb-4 flex h-8 gap-x-2 place-items-center">
+                                    {% if request.user.profile.image %}
+                                        <img class="rounded-full w-8 h-8" src="{{ request.user.profile.image.url }}" />
+                                    {% else %}
+                                        <i class="text-2xl self-center fa-regular fa-circle-user"></i>
+                                    {% endif %}
+                                    <p class="font-bold text-xl">{{ request.user.username|capfirst }}</p>
+                                </div>
+                                <div id="check" class="
+                                    {% if poll and poll.styles.first == style %} opacity-1000 {% else %} opacity-0 {% endif %}
+                                    absolute ease-in-out duration-300 top-0 left-0 w-full h-full text-8xl text-center flex items-center justify-center justify-items-center">
+                                    <i class="drop-shadow-[0_0px_3px_rgb(0,0,0)] fa-solid fa-check"></i>
+                                </div>
+                                <p></p>
+                            </label>
+                        {% endfor %}
+
+{#                        <input id="scheme-1" class="peer/1 hidden" type="checkbox" name="styles[]" value="1"/>#}
+{#                        <label for="scheme-1" class="#}
+{#                        relative peer-checked/1:scale-110 ease-in-out duration-300#}
+{#                        text-white pb-4 pt-4 px-4 w-2/3 min-h-40#}
+{#                        rounded-xl shadow-xl#}
+{#                        bg-gradient-to-br from-purple-500 to-pink-500#}
+{#                        " onclick="this.querySelector('div[id=check]').classList.toggle('opacity-0');">#}
+{#                            <div class="mb-4 flex h-8 gap-x-2 place-items-center">#}
+{#                                {% if request.user.profile.image %}#}
+{#                                    <img class="rounded-full w-8 h-8" src="{{ request.user.profile.image.url }}" />#}
+{#                                {% else %}#}
+{#                                    <i class="text-2xl self-center fa-regular fa-circle-user"></i>#}
+{#                                {% endif %}#}
+{#                                <p class="font-bold text-xl">{{ request.user.username|capfirst }}</p>#}
+{#                            </div>#}
+{#                            <div id="check" class="opacity-0 absolute ease-in-out duration-300 top-0 left-0 w-full h-full text-8xl text-center flex items-center justify-center justify-items-center">#}
+{#                                <i class="drop-shadow-[0_0px_3px_rgb(0,0,0)] fa-solid fa-check"></i>#}
+{#                            </div>#}
+{#                            <p></p>#}
+{#                        </label>#}
+{#                        <input id="scheme-2" class="peer/2 hidden" type="checkbox" name="styles[]" value="2"/>#}
+{#                        <label for="scheme-2" class="#}
+{#                        relative peer-checked/2:scale-110 ease-in-out duration-300#}
+{#                        text-white pb-4 pt-4 px-4 w-2/3 min-h-40#}
+{#                        rounded-xl shadow-xl#}
+{#                        bg-gradient-to-br from-green-500 to-blue-500#}
+{#                        " onclick="this.querySelector('div[id=check]').classList.toggle('opacity-0');">#}
+{#                            <div class="mb-4 flex h-8 gap-x-2 place-items-center">#}
+{#                                {% if request.user.profile.image %}#}
+{#                                    <img class="rounded-full w-8 h-8" src="{{ request.user.profile.image.url }}" />#}
+{#                                {% else %}#}
+{#                                    <i class="text-2xl self-center fa-regular fa-circle-user"></i>#}
+{#                                {% endif %}#}
+{#                                <p class="font-bold text-xl">{{ request.user.username|capfirst }}</p>#}
+{#                            </div>#}
+{#                            <div id="check" class="opacity-0 absolute ease-in-out duration-300 top-0 left-0 w-full h-full text-8xl text-center flex items-center justify-center justify-items-center">#}
+{#                                <i class="drop-shadow-[0_0px_3px_rgb(0,0,0)] fa-solid fa-check"></i>#}
+{#                            </div>#}
+{#                            <p></p>#}
+{#                        </label>#}
+{#                        <input id="scheme-3" class="peer/3 hidden" type="checkbox" name="styles[]" value="4"/>#}
+{#                        <label for="scheme-3" class="#}
+{#                        relative peer-checked/3:scale-110 ease-in-out duration-300#}
+{#                        text-white pb-4 pt-4 px-4 w-2/3 min-h-40#}
+{#                        rounded-xl shadow-xl#}
+{#                        bg-gradient-to-br from-pink-300 to-red-500#}
+{#                        " onclick="this.querySelector('div[id=check]').classList.toggle('opacity-0');">#}
+{#                            <div class="mb-4 flex h-8 gap-x-2 place-items-center">#}
+{#                                {% if request.user.profile.image %}#}
+{#                                    <img class="rounded-full w-8 h-8" src="{{ request.user.profile.image.url }}" />#}
+{#                                {% else %}#}
+{#                                    <i class="text-2xl self-center fa-regular fa-circle-user"></i>#}
+{#                                {% endif %}#}
+{#                                <p class="font-bold text-xl">{{ request.user.username|capfirst }}</p>#}
+{#                            </div>#}
+{#                            <div id="check" class="opacity-0 absolute ease-in-out duration-300 top-0 left-0 w-full h-full text-8xl text-center flex items-center justify-center justify-items-center">#}
+{#                                <i class="drop-shadow-[0_0px_3px_rgb(0,0,0)] fa-solid fa-check"></i>#}
+{#                            </div>#}
+{#                            <p></p>#}
+{#                        </label>#}
+{#                        <input id="scheme-4" class="peer/4 hidden" type="checkbox" name="styles[]" value="3"/>#}
+{#                        <label for="scheme-4" class="#}
+{#                        relative peer-checked/4:scale-110 ease-in-out duration-300#}
+{#                        text-white pb-4 pt-4 px-4 w-2/3 min-h-40#}
+{#                        rounded-xl shadow-xl#}
+{#                        bg-orange-300 border-4 border-orange-500#}
+{#                        " onclick="this.querySelector('div[id=check]').classList.toggle('opacity-0');">#}
+{#                            <div class="mb-4 flex h-8 gap-x-2 place-items-center">#}
+{#                                {% if request.user.profile.image %}#}
+{#                                    <img class="rounded-full w-8 h-8" src="{{ request.user.profile.image.url }}" />#}
+{#                                {% else %}#}
+{#                                    <i class="text-2xl self-center fa-regular fa-circle-user"></i>#}
+{#                                {% endif %}#}
+{#                                <p class="font-bold text-xl">{{ request.user.username|capfirst }}</p>#}
+{#                            </div>#}
+{#                            <div id="check" class="opacity-0 absolute ease-in-out duration-300 top-0 left-0 w-full h-full text-8xl text-center flex items-center justify-center justify-items-center">#}
+{#                                <i class="drop-shadow-[0_0px_3px_rgb(0,0,0)] fa-solid fa-check"></i>#}
+{#                            </div>#}
+{#                            <p></p>#}
+{#                        </label>#}
+{#                        <input id="scheme-5" class="peer/5 hidden" type="checkbox" name="styles[]" value="5"/>#}
+{#                        <label for="scheme-5" class="#}
+{#                        relative peer-checked/5:scale-110 ease-in-out duration-300#}
+{#                        text-white pb-4 pt-4 px-4 w-2/3 min-h-40#}
+{#                        rounded-xl shadow-xl#}
+{#                        border-4 bg-indigo-800 border-white border-dashed#}
+{#                        " onclick="this.querySelector('div[id=check]').classList.toggle('opacity-0');">#}
+{#                            <div class="mb-4 flex h-8 gap-x-2 place-items-center">#}
+{#                                {% if request.user.profile.image %}#}
+{#                                    <img class="rounded-full w-8 h-8" src="{{ request.user.profile.image.url }}" />#}
+{#                                {% else %}#}
+{#                                    <i class="text-2xl self-center fa-regular fa-circle-user"></i>#}
+{#                                {% endif %}#}
+{#                                <p class="font-bold text-xl">{{ request.user.username|capfirst }}</p>#}
+{#                            </div>#}
+{#                            <div id="check" class="opacity-0 absolute ease-in-out duration-300 top-0 left-0 w-full h-full text-8xl text-center flex items-center justify-center justify-items-center">#}
+{#                                <i class="drop-shadow-[0_0px_3px_rgb(0,0,0)] fa-solid fa-check"></i>#}
+{#                            </div>#}
+{#                            <p></p>#}
+{#                        </label>#}
+                    </div>
+                </div>
             </div>
         </div>
-        <button type="submit" class="block mt-8 mb-12 w-64 m-auto px-2 py-1 border-[3px] border-blue-500 hover:bg-white hover:text-blue-500 text-white bg-blue-500 rounded-xl ease-in duration-100 font-bold">Create</button>
     </form>
+{#    <div class="text-center w-full mt-10">#}
+{#        <p class="text-5xl font-bold italic">Create Poll</p>#}
+{#    </div>#}
+{#    <form method="POST" action="{% if action_id %}{% url action action_id %}{% else %}{% url action %}{% endif %}">#}
+{#        {% csrf_token %}#}
+{#        <div class="grid grid-cols-2 m-auto mt-8 px-8 w-3/4 gap-6 border-2 border-gray-300 shadow-xl py-16 rounded-xl">#}
+{#            <div class="grid grid-cols-1 gap-6 auto-rows-max justify-items-center">#}
+{#                <label for="question" class="font-bold text-xl">Question</label>#}
+{#                <textarea id="question" name="question" class="py-2 min-h-24 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0" onload="alert(1)" oninput="this.style.height = ''; this.style.height = this.scrollHeight +'px'">{% if poll %}{{ poll.question.lstrip }}{% endif %}</textarea>#}
+{#                <label for="description" class="font-bold text-xl">Description</label>#}
+{#                <textarea id="description" name="description" class="py-2 min-h-24 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0" onload="this.style.height = ''; this.style.height = this.scrollHeight +'px'" oninput="this.style.height = ''; this.style.height = this.scrollHeight +'px'">{% if poll %}{{ poll.description }}{% endif %}</textarea>#}
+{##}
+{#                <label for="underline_select" class="font-bold text-xl">Style</label>#}
+{#                <select name="style" id="underline_select" class="font-bold block py-2.5 px-0 w-2/3 text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer">#}
+{#                    <option selected>Choose style</option>#}
+{#                    {% for style in styles %}#}
+{#                        <option value="{{ style.id }}">{{ style.name }}</option>#}
+{#                    {% endfor %}#}
+{#                </select>#}
+{#            </div>#}
+{#            <div id="options" class="grid grid-cols-1 justify-items-center gap-6">#}
+{#                {% if poll %}#}
+{#                    {% for option in options %}#}
+{#                        <label for="vote{{ forloop.counter0|add:"1" }}" class="font-bold text-xl">Option No.{{ forloop.counter0|add:"1" }}</label>#}
+{#                        <input value="{% if poll %}{{ option.label }}{% endif %}" id="vote{{ forloop.counter0|add:"1" }}" name="options[]" type="text" class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>#}
+{#                    {% endfor %}#}
+{#                {% else %}#}
+{#                    <label for="vote1" class="font-bold text-xl">Option No.1</label>#}
+{#                    <input id="vote1" name="options[]" type="text" class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>#}
+{#                    <label for="vote2" class="font-bold text-xl">Option No.2</label>#}
+{#                    <input id="vote2" name="options[]" type="text" class="py-2 h-12 w-2/3 px-6 border-2 border-gray-300 rounded-xl shadow-xl placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0"/>#}
+{#                {% endif %}#}
+{#            </div>#}
+{#            <div></div>#}
+{#            <div class="flex justify-self-center gap-2">#}
+{#                <button id="addOption" type="button" class="mt-4 m-auto px-3 py-1 border-[3px] border-green-500 hover:bg-white hover:text-green-500 text-white bg-green-500 rounded-xl ease-in duration-100 font-bold"><i class="fa-solid fa-plus"></i></button>#}
+{#                <button id="removeOption" type="button" class="mt-4 m-auto px-3 py-1 border-[3px] border-red-500 hover:bg-white hover:text-red-500 text-white bg-red-500 rounded-xl ease-in duration-100 font-bold"><i class="fa-solid fa-minus"></i></button>#}
+{#            </div>#}
+{#        </div>#}
+{#        <button type="submit" class="block mt-8 mb-12 w-64 m-auto px-2 py-1 border-[3px] border-blue-500 hover:bg-white hover:text-blue-500 text-white bg-blue-500 rounded-xl ease-in duration-100 font-bold">Create</button>#}
+{#    </form>#}
 
     <script>
         let textareas = document.querySelectorAll('textarea');
@@ -50,29 +271,49 @@
             textarea.style.height = textarea.scrollHeight +'px'
         })
 
+        document.getElementById("switchContent").addEventListener("change", function(){
+            let switchContent = document.getElementById("switchContent").checked;
+            let opitonsContent = document.getElementById('optionsContent');
+            let styleContent = document.getElementById('styleContent');
+
+            if(switchContent){
+                styleContent.classList.remove('hidden');
+                opitonsContent.classList.add('hidden');
+            }
+            else{
+                styleContent.classList.add('hidden');
+                opitonsContent.classList.remove('hidden');
+            }
+        });
+
         document.getElementById("addOption").addEventListener("click", function(){
-            let query = document.querySelectorAll('[name="options[]"]');
-            {#let vote = query[0];#}
+            let optionDiv = document.getElementById("optionsContainer");
+            let query = optionDiv.querySelectorAll('div');
+
+            let div = document.createElement("div");
+            div.classList.add("mt-4", "grid", "grid-cols-1")
+
             let label = document.createElement("label");
-            label.classList.add("font-bold", "text-xl");
+            label.classList.add("font-semibold", "text-sm", "mb-1");
             label.htmlFor = `vote${query.length+1}`;
-            label.innerHTML = `Option No. ${query.length+1}`;
+            label.innerHTML = `Option No.${query.length+1}`;
+            div.appendChild(label);
+
             let element = document.createElement("input");
             element.name = "options[]";
             element.id = `vote${query.length+1}`;
-            element.classList.add("py-2", "h-12", "w-2/3", "px-6", "border-2", "border-gray-300", "rounded-xl", "shadow-xl", "placeholder:font-bold", "focus:ring-blue-500", "focus:border-blue-400", "focus:shadow-blue-100", "focus-visible:ring-0", "focus-visible:outline-0");
-            let optionDiv = document.getElementById("options");
-            optionDiv.appendChild(label);
-            optionDiv.appendChild(element);
+            element.classList.add("py-2", "w-3/4", "px-6", "border-2", "border-gray-300", "rounded-md", "shadow-xl", "overflow-hidden", "placeholder:font-bold", "focus:ring-blue-500", "focus:border-blue-400", "focus:shadow-blue-100", "focus-visible:ring-0", "focus-visible:outline-0");
+            div.appendChild(element);
+
+
+            optionDiv.appendChild(div);
         });
 
         document.getElementById("removeOption").addEventListener("click", function(){
-            let query = document.querySelectorAll('[name="options[]"]');
-            let optionDiv = document.getElementById("options");
-            let label = optionDiv.querySelectorAll('label')[query.length-1];
-            let vote = optionDiv.querySelectorAll('input')[query.length-1];
-            optionDiv.removeChild(label);
-            optionDiv.removeChild(vote);
+            let optionDiv = document.getElementById("optionsContainer");
+            let divs = optionDiv.querySelectorAll('div');
+
+            optionDiv.removeChild(divs[divs.length-1]);
         });
 
     </script>

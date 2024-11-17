@@ -11,4 +11,5 @@ urlpatterns = [
     path('edit-poll/<int:pk>/', views.edit_poll, name="edit-poll"),
     path('update-poll/<int:pk>/', views.update_poll, name="update-poll"),
     path('delete-poll/<int:pk>/', views.delete_poll, name="delete-poll"),
+    path('seed/', views.seed, name="seed"),
 ]
