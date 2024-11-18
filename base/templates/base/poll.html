@@ -28,6 +28,13 @@
                 <i class="fa-solid fa-chart-pie"></i>
             </button>
         </div>
+        <div class="flex gap-x-2 mb-2">
+            {% for tag in poll.tags.all %}
+                <div class="border-2 text-sm px-2 rounded-md bg-white/20">
+                    {{ tag.name }}
+                </div>
+            {% endfor %}
+        </div>
         <p class="font-bold">Question:</p>
         <p>{{ poll.question }}</p>
         <p class="mt-6 font-bold">Description:</p>

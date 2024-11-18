@@ -25,17 +25,16 @@
                     </label>
                     <textarea id="description" name="description" class="py-2 min-h-24 w-full px-6 border-2 border-gray-300 rounded-md shadow-xl overflow-hidden placeholder:font-bold focus:ring-blue-500 focus:border-blue-400 focus:shadow-blue-100 focus-visible:ring-0 focus-visible:outline-0">{% if poll %}{{ poll.description.lstrip }}{% endif %}</textarea>
                 </div>
-{#                <div class="mt-4 grid grid-cols-1">#}
-{#                    <label for="tags" class="font-semibold text-sm mb-1">#}
-{#                        Tags <span class="text-red-500 font-bold">*</span>#}
-{#                    </label>#}
-{#                    <select multiple name="tags" id="countries_multiple" class="py-2 h-20 w-full px-6 border-2 border-gray-300 rounded-md shadow-xl">#}
-{#                        <option value="US">United States</option>#}
-{#                        <option value="CA">Canada</option>#}
-{#                        <option value="FR">France</option>#}
-{#                        <option value="DE">Germany</option>#}
-{#                    </select>#}
-{#                </div>#}
+                <div class="mt-4 grid grid-cols-1">
+                    <label for="tags" class="font-semibold text-sm mb-1">
+                        Tags <span class="text-red-500 font-bold">*</span>
+                    </label>
+                    <select multiple name="tags" id="countries_multiple" class="py-2 h-20 w-full px-6 border-2 border-gray-300 rounded-md shadow-xl">
+                        {% for tag in tags %}
+                            <option {% if tag in poll.tags.all %} selected {% endif %} value="{{ tag.id }}">{{ tag.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
 
             <div></div>

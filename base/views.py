@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods, require_POST
-from .models import Poll, Option, Vote, Style
+from .models import Poll, Option, Vote, Style, Tag
 import json
 
 
@@ -64,7 +64,12 @@ def poll(request, pk):
 @login_required(login_url='login')
 def create_poll(request):
     styles = Style.objects.all()
-    context = {'action': 'store-poll', 'styles': styles}
+    tags = Tag.objects.all()
+    context = {
+        'action': 'store-poll',
+        'styles': styles,
+        'tags': tags
+    }
     return render(request, 'base/poll_form.html', context)
 
 @login_required(login_url='login')
@@ -74,7 +79,12 @@ def store_poll(request):
     question = request.POST.get('question')
     description = request.POST.get('description')
     options = request.POST.getlist('options[]')
-    style = request.POST.getlist('styles[]')[0]
+    style = request.POST.getlist('styles[]')
+    tags = request.POST.getlist('tags')
+
+    if not style:
+        messages.error(request, "Style is required")
+        return redirect('create-poll')
 
     poll = Poll.objects.create(
         question=question,
@@ -82,13 +92,15 @@ def store_poll(request):
         made_by=request.user,
     )
 
-    poll.styles.add(Style.objects.get(id=style))
+    poll.styles.add(Style.objects.get(id=style[0]))
 
     for option in options:
         Option.objects.create(
             label=option,
             poll=poll
         )
+
+    poll.tags.add(*tags)
 
     messages.success(request, "Poll created successfully!")
     return redirect('home')
@@ -98,6 +110,7 @@ def edit_poll(request, pk):
     poll = Poll.objects.get(id=pk)
     options = Option.objects.filter(poll=poll)
     styles = Style.objects.all()
+    tags = Tag.objects.all()
 
     if request.user != poll.made_by:
         messages.error(request, "You are not allowed to edit this poll.")
@@ -107,8 +120,9 @@ def edit_poll(request, pk):
         'action': "update-poll",
         'styles': styles,
         'action_id': pk,
-        'poll' : poll,
-        'options': options
+        'poll': poll,
+        'options': options,
+        'tags': tags
     }
     return render(request, 'base/poll_form.html', context)
 
@@ -117,6 +131,7 @@ def update_poll(request, pk):
     description = request.POST.get('description')
     options = request.POST.getlist('options[]')
     styles = request.POST.getlist('styles[]')
+    tags = request.POST.getlist('tags')
 
     if not styles:
         messages.error(request, "Style is required")
@@ -140,6 +155,9 @@ def update_poll(request, pk):
 
     poll.styles.clear()
     poll.styles.add(styles[0])
+
+    poll.tags.clear()
+    poll.tags.add(*tags)
 
     messages.success(request, "Poll edited successfully!")
     return redirect('home')
@@ -201,6 +219,22 @@ def seed(request):
     Style.objects.create(
         name='White dashed border with dark blue background',
         tailwind_classes='border-4 bg-indigo-800 border-white border-dashed'
+    )
+
+    Tag.objects.create(
+        name='Funny'
+    )
+    Tag.objects.create(
+        name='Adult'
+    )
+    Tag.objects.create(
+        name='Cars'
+    )
+    Tag.objects.create(
+        name='Business'
+    )
+    Tag.objects.create(
+        name='School'
     )
 
     return redirect('home')

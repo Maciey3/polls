@@ -5,6 +5,15 @@ from django.contrib.auth.models import User
 class Style(models.Model):
     name = models.TextField()
     tailwind_classes = models.TextField(null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+class Tag(models.Model):
+    name = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
 
 class Poll(models.Model):
     question = models.TextField()
@@ -13,6 +22,7 @@ class Poll(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     styles = models.ManyToManyField(Style)
+    tags = models.ManyToManyField(Tag)
 
     class Meta:
         ordering = ['-updated', '-created']
