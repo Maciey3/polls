@@ -6,7 +6,6 @@ import random
 
 @pytest.fixture
 def driver():
-    # Setup ChromeDriver
     driver = webdriver.Chrome()
     driver.get("http://localhost:8000/")
     yield driver
