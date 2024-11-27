@@ -6,8 +6,8 @@ import time
 
 @pytest.fixture
 def setup():
-    driver = webdriver.Chrome()  # Użyj odpowiedniego sterownika (np. geckodriver dla Firefoxa)
-    driver.get("http://localhost:8000/")  # Zastąp "localhost:8000" rzeczywistym adresem
+    driver = webdriver.Chrome()
+    driver.get("http://localhost:8000/")
     yield driver
     driver.quit()
 
@@ -20,11 +20,11 @@ def test_successful_login(setup):
 
     time.sleep(2)
 
-    username_field = driver.find_element(By.NAME, "username")  # Dopasuj 'name' lub inne atrybuty
-    password_field = driver.find_element(By.NAME, "password")  # Dopasuj 'name' lub inne atrybuty
+    username_field = driver.find_element(By.NAME, "username")
+    password_field = driver.find_element(By.NAME, "password")
 
-    username_field.send_keys("testuser")  # Nazwa użytkownika testowego
-    password_field.send_keys("password123")  # Hasło testowe
+    username_field.send_keys("testuser")
+    password_field.send_keys("password123")
 
     submit_button = driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
     submit_button.click()
@@ -35,7 +35,6 @@ def test_successful_login(setup):
     assert logout_button.is_displayed()
 
 def test_unsuccessful_login(setup):
-    """Test nieudanego logowania."""
     driver = setup
 
     login_button = driver.find_element(By.LINK_TEXT, "Login")
