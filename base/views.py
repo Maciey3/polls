@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods, require_POST
 from .models import Poll, Option, Vote, Style, Tag
+from comments.models import Comment
 import json
 
 
@@ -15,12 +16,25 @@ def home(request):
 
     question_len = 250
     q = request.GET.get('q') if request.GET.get('q') else ''
+    q_tags = request.GET.getlist('tags') if request.GET.get('tags') else ''
+    q_tags = [int(item) for item in q_tags]
+
     polls = Poll.objects.filter(
-        Q(question__icontains=q) | Q(description__icontains=q)
-    )
-    # print(polls.first().styles.get().id)
+        Q(question__icontains=q) | Q(description__icontains=q),
+        Q(tags__id__in=q_tags)
+        if q_tags else Q(question__icontains=q) | Q(description__icontains=q)
+    ).distinct()
+
+    tags = Tag.objects.all()
+
     polls_shortened = [poll if len(poll.question) < question_len else cut_poll_description(poll) for poll in polls]
-    context = {'polls': polls_shortened, 'search': q}
+    context = {
+        'polls': polls_shortened,
+        'search': q,
+        'search_tags': q_tags,
+        'tags': tags
+    }
+
     return render(request, 'base/home.html', context)
 
 def poll(request, pk):
@@ -43,8 +57,9 @@ def poll(request, pk):
         return options, tmp
 
     poll = Poll.objects.get(id=pk)
-    options = poll.option_set.all()
+    options = poll.options
     votes = Vote.objects.filter(poll_id=pk)
+    comments = poll.comments
     options, js_dict = compute_percent(votes, options)
 
     user_vote = votes.filter(user_id=request.user.id)
@@ -58,6 +73,7 @@ def poll(request, pk):
         'vote_id': user_vote.get().option_id if user_vote else None,
         'js_keys': json.dumps(list(js_dict.keys())),
         'js_values': json.dumps(list(js_dict.values())),
+        'comments': comments
     }
     return render(request, 'base/poll.html', context)
 

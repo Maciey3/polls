@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
     'base.apps.BaseConfig',
     'members.apps.MembersConfig',
+    'comments.apps.CommentsConfig',
 ]
 
 MIDDLEWARE = [

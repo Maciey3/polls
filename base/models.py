@@ -35,6 +35,10 @@ class Poll(models.Model):
         return (self.option_set.all())
 
     @property
+    def comments(self):
+        return (self.comment_set.all())
+
+    @property
     def user(self):
         return self.made_by
 
