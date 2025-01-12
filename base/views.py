@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods, require_POST
 from .models import Poll, Option, Vote, Style, Tag
 from comments.models import Comment
 import json
+from datetime import datetime, timedelta, timezone
 
 
 def home(request):
@@ -59,12 +60,32 @@ def poll(request, pk):
     poll = Poll.objects.get(id=pk)
     options = poll.options
     votes = Vote.objects.filter(poll_id=pk)
-    comments = poll.comments
+
+    comments = poll.comments.annotate(
+        votes_sum=Count('commentvote', filter=Q(commentvote__vote=True)) -
+                  Count('commentvote', filter=Q(commentvote__vote=False))
+    ).order_by('-votes_sum')
+    # Comment.objects
+
+    for comment in comments:
+        timediff = datetime.now(timezone.utc) - comment.created
+        if timediff.days >= 1:
+            comment.time_ago = f'{timediff.days} days ago'
+        elif timediff.seconds // 3600 > 1:
+            comment.time_ago = f'{timediff.seconds // 3600} hours ago'
+        else:
+            comment.time_ago = f'{timediff.seconds // 60} minutes ago'
+
+        if request.user.is_authenticated:
+            if any(vote.user == request.user and vote.vote == 1 for vote in comment.votes):
+                comment.has_voted_positive = True
+            elif any(vote.user == request.user and vote.vote == 0 for vote in comment.votes):
+                comment.has_voted_negative = True
+
+
     options, js_dict = compute_percent(votes, options)
 
     user_vote = votes.filter(user_id=request.user.id)
-
-    print(list(js_dict.keys()))
 
     context = {
         'poll': poll,

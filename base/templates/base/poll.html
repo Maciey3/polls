@@ -84,20 +84,20 @@
             {% csrf_token %}
                 <p class="mb-4 text-xl">Comments: {{ comments|length }}</p>
                 <div class="flex gap-x-6">
-                    {% if poll.user.profile.image %}
+                    {% if request.user.profile.image %}
                         <img class="rounded-full w-8 h-8" src="{{ poll.user.profile.image.url }}" />
                     {% else %}
-                        <i class="text-2xl self-center fa-regular fa-circle-user"></i>
+                        <i class="text-3xl self-center fa-regular fa-circle-user"></i>
                     {% endif %}
                     <div class="w-full">
                         <input id="comment-input" class="h-full bg-transparent border-b-2 border-gray-400 w-full placeholder:text-gray-400
                         focus:ring-0 focus:border-b-black focus:placeholder:opacity-0 focus:shadow-0 focus-visible:ring-0 focus-visible:outline-0
                         " type="text" placeholder="Add a comment..." name="comment"
-                        onkeyup="if(this.value.length){document.getElementById('comment-buttons').classList.remove('hidden')}else{document.getElementById('comment-submit').classList.add('hidden')}"
+                        onkeyup="if(this.value.length){document.getElementById('comment-buttons').classList.remove('hidden')}else{document.getElementById('comment-buttons').classList.add('hidden')}"
                         />
                     </div>
                 </div>
-                <div class="w-full flex justify-end mt-2">
+                <div class="w-full flex justify-end mt-2 h-6">
                     <div id="comment-buttons" class="hidden">
                         <button onclick="document.getElementById('comment-input').value=''; document.getElementById('comment-buttons').classList.add('hidden')" id="comment-submit" type="button" class="px-2 text-sm border-[3px] text-black">Cancel</button>
                         <button id="comment-submit" type="submit" class="px-2 text-sm border-[3px] border-blue-500 hover:bg-white hover:text-blue-500 text-white bg-blue-500 rounded-md ease-in duration-100">Submit</button>
@@ -106,20 +106,25 @@
             </form>
         </div>
 
-        <div class="mt-6">
+        <div class="mt-6" id="comment-container">
             {% for comment in comments %}
                  <div class="flex gap-x-6 mt-6">
                     {% if comment.user.profile.image %}
                         <img class="rounded-full w-8 h-8" src="{{ comment.user.profile.image.url }}" />
                     {% else %}
-                        <i class="text-2xl self-center fa-regular fa-circle-user"></i>
+                        <i class="text-3xl self-center fa-regular fa-circle-user"></i>
                     {% endif %}
                     <div class="w-full grid grid-cols-1">
                         <div class="flex justify-between text-sm">
                             <p class="font-bold">@{{ comment.user.username }}</p>
-                            <p>{{ comment.created }}</p>
+                            <p>{{ comment.time_ago }}</p>
                         </div>
                         <p>{{ comment.text }}</p>
+                        <div class="flex items-center gap-x-2">
+                            <p>{{ comment.sum_of_votes }}</p>
+                            <i hx-get='{% url 'vote-comment' comment.id 1 %}' hx-target="#comment-container" class="text-xs fa-solid fa-thumbs-up cursor-pointer hover:text-blue-500 {% if comment.has_voted_positive %} text-blue-500 {% endif %}"></i>
+                            <i hx-get='{% url 'vote-comment' comment.id 0 %}' hx-target="#comment-container" class="text-xs fa-solid fa-thumbs-down cursor-pointer hover:text-blue-500 {% if comment.has_voted_negative %} text-blue-500 {% endif %}"></i>
+                        </div>
                     </div>
                 </div>
             {% endfor %}
